@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 [System.Serializable]
-public class SimulacionCarro 
+public class SimulationInfo 
 {
     public Dicc dicc;
     
@@ -94,21 +95,45 @@ public class Sem
 public class CarMovement: MonoBehaviour
 
 {
-    public SimulacionCarro simulacionCarro;
+
+    public string url = "https://agente-tec-hilarious-ardvark.mybluemix.net/";
+    public SimulationInfo simulationInfo;
+    public TextAsset jsonFile;
+    public SpawnManager spawnManager;
     // Start is called before the first frame update
+    
+
     void Start()
     {
-        string jsonString = jsonFile.text;
-        SimulacionCarro simulacionCarro = JsonUtility.FromJson<SimulacionCarro>(jsonString);
-        
-        Debug.Log(simulacionCarro.dicc.carros.posiciones.car1.lista[0]);
+        StartCoroutine(GetRequest(url));
     }
 
-    public TextAsset jsonFile;
-
-    // Update is called once per frame
-    void Update()
+    IEnumerator GetRequest(string url){
+    using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
     {
+        // Request and wait for the desired page.
+        yield return webRequest.SendWebRequest();
+
+        string[] pages = url.Split('/');
+        int page = pages.Length - 1;
+
+        switch (webRequest.result)
+        {
+            case UnityWebRequest.Result.ConnectionError:
+            case UnityWebRequest.Result.DataProcessingError:
+                Debug.LogError(pages[page] + ": Error: " + webRequest.error);
+                break;
+            case UnityWebRequest.Result.ProtocolError:
+                Debug.LogError(pages[page] + ": HTTP Error: " + webRequest.error);
+                break;
+                case UnityWebRequest.Result.Success:
+
+                string jsonString = webRequest.downloadHandler.text;
+                SimulationInfo simulationInfo = JsonUtility.FromJson<SimulationInfo>(jsonString);
+                spawnManager.SpawnAgents(simulationInfo);
+                break;
         
+    }
+    }
     }
 }
