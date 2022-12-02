@@ -29,9 +29,9 @@ public class MoveController : MonoBehaviour
             
             count = count + 6;
 
-            if (count > 14004 - 1)
+            if (count > 26928 - 1)
             {
-                count = 14004 - 1;
+                count = 26928 - 1;
 
                 enabled = false;
             }

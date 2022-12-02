@@ -6,7 +6,7 @@ public class CarAgent : AgentComponent
 {
     public Transform target;
     public float speed = 1;
-    public float rotationSpeed = 1;
+    public float rotationSpeed = 999;
     Vector3 lastPosition;
     public UIIdentifier uiIdentifier;
 
@@ -36,9 +36,12 @@ public class CarAgent : AgentComponent
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 Quaternion.LookRotation(-movementDirection),
-                Time.deltaTime * rotationSpeed
+                //Time.deltaTime * rotationSpeed
+                1
                 );
         }
+
+        
 
         lastPosition = transform.position;
     }
